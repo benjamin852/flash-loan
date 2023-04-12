@@ -11,8 +11,9 @@ import "@uniswap/v3-periphery/contracts/libraries/CallbackValidation.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
-contract FlashSwap {
+contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
     /*** STORAGE ***/
+    ISwapRouter public Immutable swapRouter;
 
     /*** MODIFIERS ***/
     modifier lock() {
@@ -22,6 +23,22 @@ contract FlashSwap {
     modifier noDelegateCall() {
         _;
     }
+
+
+    /*** CONSTRUCTOR ***/
+
+
+    /**
+     * @notice set needed contract addresses in local storage
+     * @param _swapRouter swapRouter address
+     * @param _factory factory address
+     * @param _weth9 weth9 address
+     */
+    constructor(ISwapRouter _swapRouter, address _factory, address _weth9)  PeripheryImmutableState(_factory, _weth9) {
+        swapRouter = _swapRouter;
+        
+    }
+
 
     /*** FUNCTIONS ***/
 
