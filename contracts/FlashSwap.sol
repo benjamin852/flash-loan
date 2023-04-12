@@ -13,7 +13,30 @@ import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
 contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
     /*** STORAGE ***/
-    ISwapRouter public Immutable swapRouter;
+    ISwapRouter public immutable swapRouter;
+
+    /*
+     - token amounts and address pulled out of pool
+     - fee tiers determine which pool we withdraw & swap with
+    */
+    struct FlashParams {
+        address token0;
+        address token1;
+        uint24 fee1;
+        uint256 amount0;
+        uint256 amount1;
+        uint24 fee2;
+        uint24 fee3;
+    }
+
+    struct FlashCallbackData {
+        uint256 amount0;
+        uint256 amount1;
+        address payer;
+        PoolAddress.PoolKey poolKey; //sorted tokens with the matched fee tier
+        uint24 poolFee2;
+        uint24 poolFee3;
+    }
 
     /*** MODIFIERS ***/
     modifier lock() {
@@ -24,9 +47,7 @@ contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
         _;
     }
 
-
     /*** CONSTRUCTOR ***/
-
 
     /**
      * @notice set needed contract addresses in local storage
@@ -34,13 +55,27 @@ contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
      * @param _factory factory address
      * @param _weth9 weth9 address
      */
-    constructor(ISwapRouter _swapRouter, address _factory, address _weth9)  PeripheryImmutableState(_factory, _weth9) {
+    constructor(
+        ISwapRouter _swapRouter,
+        address _factory,
+        address _weth9
+    ) PeripheryImmutableState(_factory, _weth9) {
         swapRouter = _swapRouter;
-        
     }
 
-
     /*** FUNCTIONS ***/
+
+    /**
+     *
+     * @param _flashParams token addresses and fee
+     */
+    function initFlash(FlashParams memory _flashParams) external {
+        PoolAddress.PoolKey memory poolKey = PoolAddress.PoolKey({
+            token0: _flashParams.token0,
+            token1: _flashParams.token1,
+            fee: _flashParams.fee1
+        });
+    }
 
     /**
      * @notice borrow and payback funds in one tx
