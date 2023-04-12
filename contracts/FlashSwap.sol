@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.18;
+pragma solidity ^0.7.6;
+pragma abicoder v2;
 
 import "@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3FlashCallback.sol";
 import "@uniswap/v3-core/contracts/libraries/LowGasSafeMath.sol";
@@ -11,8 +12,11 @@ import "@uniswap/v3-periphery/contracts/libraries/CallbackValidation.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
-contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
+abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
     /*** STORAGE ***/
+    using LowGasSafeMath for uint256;
+    using LowGasSafeMath for int256;
+
     ISwapRouter public immutable swapRouter;
 
     /*
@@ -26,7 +30,7 @@ contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
         uint256 amount0;
         uint256 amount1;
         uint24 fee2; //fee for first pool to arb from
-        uint24 fee3; //fee for the second pool to arb from 
+        uint24 fee3; //fee for the second pool to arb from
     }
 
     struct FlashCallbackData {
@@ -78,7 +82,7 @@ contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
 
         //get uniswap pool
         IUniswapV3Pool pool = IUniswapV3Pool(
-            PoolAddress.computerAddress(factory, poolKey)
+            PoolAddress.computeAddress(factory, poolKey)
         );
 
         // call flash on our pool
@@ -87,14 +91,16 @@ contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
             _flashParams.amount0,
             _flashParams.amount1,
             //will be decoded in the callback for part2 of tx
-            abi.encode(FlashCallbackData(
-                amount0: _flashParams.amount0,
-                amount1: _flashParams.amount1,
-                payer: msg.sender,
-                poolKey: poolKey,
-                poolFee2: _flashParams.fee2,
-                poolFee3: _flashParams.fee3
-            ))
+            abi.encode(
+                FlashCallbackData({
+                    amount0: _flashParams.amount0,
+                    amount1: _flashParams.amount1,
+                    payer: msg.sender,
+                    poolKey: poolKey,
+                    poolFee2: _flashParams.fee2,
+                    poolFee3: _flashParams.fee3
+                })
+            )
         );
     }
 
@@ -110,5 +116,5 @@ contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
         uint256 _token0Amount,
         uint256 _token1Amount,
         bytes calldata _data
-    ) external override lock noDelegateCall {}
+    ) external lock noDelegateCall {}
 }
