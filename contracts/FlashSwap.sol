@@ -22,11 +22,11 @@ contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
     struct FlashParams {
         address token0;
         address token1;
-        uint24 fee1;
+        uint24 fee1; //fee for initial borrow
         uint256 amount0;
         uint256 amount1;
-        uint24 fee2;
-        uint24 fee3;
+        uint24 fee2; //fee for first pool to arb from
+        uint24 fee3; //fee for the second pool to arb from 
     }
 
     struct FlashCallbackData {
@@ -34,8 +34,8 @@ contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
         uint256 amount1;
         address payer;
         PoolAddress.PoolKey poolKey; //sorted tokens with the matched fee tier
-        uint24 poolFee2;
-        uint24 poolFee3;
+        uint24 poolFee2; //fee for second pool of token0 & token1
+        uint24 poolFee3; //fee for second pool of token0 & token1
     }
 
     /*** MODIFIERS ***/
@@ -75,6 +75,27 @@ contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
             token1: _flashParams.token1,
             fee: _flashParams.fee1
         });
+
+        //get uniswap pool
+        IUniswapV3Pool pool = IUniswapV3Pool(
+            PoolAddress.computerAddress(factory, poolKey)
+        );
+
+        // call flash on our pool
+        pool.flash(
+            address(this),
+            _flashParams.amount0,
+            _flashParams.amount1,
+            //will be decoded in the callback for part2 of tx
+            abi.encode(FlashCallbackData(
+                amount0: _flashParams.amount0,
+                amount1: _flashParams.amount1,
+                payer: msg.sender,
+                poolKey: poolKey,
+                poolFee2: _flashParams.fee2,
+                poolFee3: _flashParams.fee3
+            ))
+        );
     }
 
     /**
