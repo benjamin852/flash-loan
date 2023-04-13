@@ -70,7 +70,7 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
     /*** FUNCTIONS ***/
 
     /**
-     *
+     * @notice create new flash loan on pool
      * @param _flashParams token addresses and fee
      */
     function initFlash(FlashParams memory _flashParams) external {
@@ -101,6 +101,75 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
                     poolFee3: _flashParams.fee3
                 })
             )
+        );
+    }
+
+    /**
+     * @param _fee0
+     * @param _fee1
+     * @param _data encoded from call data
+     */
+    function flashCallback(
+        uint256 _fee0,
+        uint256 _fee1,
+        bytes calldata _data
+    ) external {
+        FlashCallbackData memory decoded = abi.decode(
+            _data,
+            (FlashCallbackData)
+        );
+
+        //verify call coming from uniswap pool
+        CallbackValidation.verifyCallback(factory, decoded.poolKey);
+
+        address token0 = decoded.poolKey.token0;
+        address token1 = decoded.poolKey.token1;
+
+        //approve router to interact with token0
+        TransferHelper.safeApprove(
+            token0,
+            address(swapRouter),
+            decoded.amount0
+        );
+
+        // approve router to interact with token1
+        TransferHelper.safeApprove(
+            token1,
+            address(swapRouter),
+            decoded.amount1
+        );
+
+        // set min amount to revert if trade no profitable
+        uint256 amount0Min = LowGasSafeMath.add(decoded.amount0, _fee0);
+        uint256 amount1Min = LowGasSafeMath.add(decoded.amount1, _fee1);
+
+        //swap out withdrawn token0 for token1 in pool with fee2
+        // pool determined by token pair with next pool fee
+        uint256 amountOut0 = swapRouter.exactInputSingle(
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: token1,
+                tokenOut: token0,
+                fee: decoded.poolFee2,
+                recipient: address(this),
+                deadline: block.timestamp + 200,
+                amountIn: decoded.amount1,
+                amountOutMinimum: amount0Min,
+                sqrtPriceLimitX96: 0
+            })
+        );
+
+        //swap out token1 for token0 pool with fee3
+        uint256 amountOut1 = swapRouter.exactInputSingle(
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: token0,
+                tokenOut: token1,
+                fee: decoded.poolFee3,
+                recipient: address(this),
+                deadline: block.timestamp + 200,
+                amountIn: decoded.amount0,
+                amountOutMinimum: amount1Min,
+                sqrtPriceLimitX96: 0
+            })
         );
     }
 
