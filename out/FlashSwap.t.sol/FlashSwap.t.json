@@ -1,0 +1,21 @@
+{
+  "abi": [],
+  "bytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "ast": {
+    "absolutePath": "test/FlashSwap.t.sol",
+    "id": 30680,
+    "exportedSymbols": {},
+    "nodeType": "SourceUnit",
+    "src": "226:0:38",
+    "nodes": [],
+    "license": "Unlicense"
+  },
+  "id": 38
+}
