@@ -12,7 +12,11 @@ import "@uniswap/v3-periphery/contracts/libraries/CallbackValidation.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
-abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
+contract FlashSwap is
+    IUniswapV3FlashCallback,
+    PeripheryImmutableState,
+    PeripheryPayments
+{
     /*** STORAGE ***/
     using LowGasSafeMath for uint256;
     using LowGasSafeMath for int256;
@@ -42,17 +46,7 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
         uint24 poolFee3; //fee for second pool of token0 & token1
     }
 
-    /*** MODIFIERS ***/
-    modifier lock() {
-        _;
-    }
-
-    modifier noDelegateCall() {
-        _;
-    }
-
     /*** CONSTRUCTOR ***/
-
     /**
      * @notice set needed contract addresses in local storage
      * @param _swapRouter swapRouter address
@@ -109,11 +103,11 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
      * @param _fee1 fee for the second pool
      * @param _data encoded from call data
      */
-    function flashCallback(
+    function uniswapV3FlashCallback(
         uint256 _fee0,
         uint256 _fee1,
         bytes calldata _data
-    ) external {
+    ) external override {
         FlashCallbackData memory decoded = abi.decode(
             _data,
             (FlashCallbackData)
@@ -185,20 +179,6 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
         );
     }
 
-    /**
-     * @notice borrow and payback funds in one tx
-     * @param _recipient recipient of the loan
-     * @param _token0Amount amount of token0 being withdrawn
-     * @param _token1Amount  amount of token1 being withdrawn
-     * @param _data encoded data to be used during swap
-     */
-    function flash(
-        address _recipient,
-        uint256 _token0Amount,
-        uint256 _token1Amount,
-        bytes calldata _data
-    ) external lock noDelegateCall {}
-
     /*** HELPERS ***/
 
     /**
@@ -223,7 +203,7 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
         uint256 _amountEarnedToken0,
         uint256 _amountEarnedToken1,
         address _payer
-    ) internal {
+    ) public {
         //owed is howmuch i borrowed + the fee
         uint256 amountToken0Owed = LowGasSafeMath.add(_swapAmount0, _fee0);
         uint256 amountToken1Owed = LowGasSafeMath.add(_swapAmount1, _fee1);
@@ -244,7 +224,7 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
             pay(_token1, address(this), msg.sender, amountToken1Owed);
         }
 
-        //pay remaining profits to flash loan
+        //pay remaining profits to flash loaner
         if (_amountEarnedToken0 > amountToken0Owed) {
             uint256 profitToken0 = LowGasSafeMath.sub(
                 _amountEarnedToken0,
