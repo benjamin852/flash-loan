@@ -105,8 +105,8 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
     }
 
     /**
-     * @param _fee0
-     * @param _fee1
+     * @param _fee0 fee for the first pool
+     * @param _fee1 fee for the second pool
      * @param _data encoded from call data
      */
     function flashCallback(
@@ -145,7 +145,7 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
 
         //swap out withdrawn token0 for token1 in pool with fee2
         // pool determined by token pair with next pool fee
-        uint256 amountOut0 = swapRouter.exactInputSingle(
+        uint256 amountEarned0 = swapRouter.exactInputSingle(
             ISwapRouter.ExactInputSingleParams({
                 tokenIn: token1,
                 tokenOut: token0,
@@ -159,7 +159,7 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
         );
 
         //swap out token1 for token0 pool with fee3
-        uint256 amountOut1 = swapRouter.exactInputSingle(
+        uint256 amountEarned1 = swapRouter.exactInputSingle(
             ISwapRouter.ExactInputSingleParams({
                 tokenIn: token0,
                 tokenOut: token1,
@@ -170,6 +170,18 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
                 amountOutMinimum: amount1Min,
                 sqrtPriceLimitX96: 0
             })
+        );
+
+        _paybackPool(
+            decoded.amount0,
+            decoded.amount1,
+            _fee0,
+            _fee1,
+            token0,
+            token1,
+            amountEarned0,
+            amountEarned1,
+            decoded.payer
         );
     }
 
@@ -186,4 +198,73 @@ abstract contract FlashSwap is IUniswapV3FlashCallback, PeripheryPayments {
         uint256 _token1Amount,
         bytes calldata _data
     ) external lock noDelegateCall {}
+
+    /*** HELPERS ***/
+
+    /**
+     *
+     * @param _swapAmount0 amount of tokenOne swapped in on dex1 (i think)
+     * @param _swapAmount1 amount of tokenTwo swapped in on dex1 (i think)
+     * @param _fee0 swap fee for tokenOne on dexOne
+     * @param _fee1 swap fee for tokenTwo  on dexOne
+     * @param _token0 address of tokenOne
+     * @param _token1 address of tokenTwo
+     * @param _amountEarnedToken0 amount of token0 earned on output of swap
+     * @param _amountEarnedToken1 amount of token1 earned on output of swap
+     * @param _payer user triggering the flash loan
+     */
+    function _paybackPool(
+        uint256 _swapAmount0,
+        uint256 _swapAmount1,
+        uint256 _fee0,
+        uint256 _fee1,
+        address _token0,
+        address _token1,
+        uint256 _amountEarnedToken0,
+        uint256 _amountEarnedToken1,
+        address _payer
+    ) internal {
+        //owed is howmuch i borrowed + the fee
+        uint256 amountToken0Owed = LowGasSafeMath.add(_swapAmount0, _fee0);
+        uint256 amountToken1Owed = LowGasSafeMath.add(_swapAmount1, _fee1);
+
+        //enable swap to transfer token0 owed
+        TransferHelper.safeApprove(_token0, address(this), amountToken0Owed);
+        TransferHelper.safeApprove(_token1, address(this), amountToken1Owed);
+
+        //pay back pool
+        if (amountToken0Owed > 0) {
+            //pay from address(this)
+            //pay to to msg.sender (pool is calling this)
+            pay(_token0, address(this), msg.sender, amountToken0Owed);
+        }
+
+        //pay back pool
+        if (amountToken1Owed > 0) {
+            pay(_token1, address(this), msg.sender, amountToken1Owed);
+        }
+
+        //pay remaining profits to flash loan
+        if (_amountEarnedToken0 > amountToken0Owed) {
+            uint256 profitToken0 = LowGasSafeMath.sub(
+                _amountEarnedToken0,
+                amountToken0Owed
+            );
+
+            TransferHelper.safeApprove(_token0, address(this), profitToken0);
+
+            pay(_token0, address(this), _payer, profitToken0);
+        }
+
+        if (_amountEarnedToken1 > amountToken1Owed) {
+            uint256 profitToken1 = LowGasSafeMath.sub(
+                _amountEarnedToken1,
+                amountToken1Owed
+            );
+
+            TransferHelper.safeApprove(_token0, address(this), profitToken1);
+
+            pay(_token0, address(this), _payer, profitToken1);
+        }
+    }
 }
