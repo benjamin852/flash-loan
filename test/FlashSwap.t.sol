@@ -1,9 +1,13 @@
-// // SPDX-License-Identifier: Unlicense
-// pragma solidity ^0.8.18;
+// SPDX-License-Identifier: Unlicense
+pragma solidity ^0.7.6;
+pragma abicoder v2;
 
-// import "forge-std/Test.sol";
-// import "./FlashSwap.sol";
+import "forge-std/Test.sol";
+import "../contracts/FlashSwap.sol";
+import "./FlashSwapSetup.t.sol";
 
-// contract Constructor is Setup {
-//     function testShouldSetSwapRouter() external {}
-// }
+contract Constructor is Test, FlashSwapSetup {
+    // function setUp() public {}
+
+    function testShouldSetSwapRouter() external {}
+}

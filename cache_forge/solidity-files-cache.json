@@ -1637,8 +1637,8 @@
       }
     },
     "test/FlashSwap.t.sol": {
-      "lastModificationDate": 1681397469538,
-      "contentHash": "633f01f323f1f9c22683c00e29f780a2",
+      "lastModificationDate": 1681399869503,
+      "contentHash": "0fd536072849d5b278b3a3e8abd6366a",
       "sourceName": "test/FlashSwap.t.sol",
       "solcConfig": {
         "settings": {
@@ -1668,17 +1668,57 @@
           "libraries": {}
         }
       },
-      "imports": [],
-      "versionRequirement": null,
+      "imports": [
+        "contracts/FlashSwap.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdInvariant.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdStyle.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol",
+        "node_modules/@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3FlashCallback.sol",
+        "node_modules/@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol",
+        "node_modules/@uniswap/v3-core/contracts/interfaces/pool/IUniswapV3PoolActions.sol",
+        "node_modules/@uniswap/v3-core/contracts/interfaces/pool/IUniswapV3PoolDerivedState.sol",
+        "node_modules/@uniswap/v3-core/contracts/interfaces/pool/IUniswapV3PoolEvents.sol",
+        "node_modules/@uniswap/v3-core/contracts/interfaces/pool/IUniswapV3PoolImmutables.sol",
+        "node_modules/@uniswap/v3-core/contracts/interfaces/pool/IUniswapV3PoolOwnerActions.sol",
+        "node_modules/@uniswap/v3-core/contracts/interfaces/pool/IUniswapV3PoolState.sol",
+        "node_modules/@uniswap/v3-core/contracts/libraries/LowGasSafeMath.sol",
+        "node_modules/@uniswap/v3-periphery/contracts/base/PeripheryImmutableState.sol",
+        "node_modules/@uniswap/v3-periphery/contracts/base/PeripheryPayments.sol",
+        "node_modules/@uniswap/v3-periphery/contracts/interfaces/IPeripheryImmutableState.sol",
+        "node_modules/@uniswap/v3-periphery/contracts/interfaces/IPeripheryPayments.sol",
+        "node_modules/@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol",
+        "node_modules/@uniswap/v3-periphery/contracts/interfaces/external/IWETH9.sol",
+        "node_modules/@uniswap/v3-periphery/contracts/libraries/CallbackValidation.sol",
+        "node_modules/@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol",
+        "node_modules/@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol",
+        "test/FlashSwapSetup.t.sol"
+      ],
+      "versionRequirement": "^0.7.6",
       "artifacts": {
-        "FlashSwap.t": {
-          "0.7.6+commit.7338295f.Darwin.appleclang": "FlashSwap.t.sol/FlashSwap.t.json"
+        "Constructor": {
+          "0.7.6+commit.7338295f.Darwin.appleclang": "FlashSwap.t.sol/Constructor.json"
         }
       }
     },
     "test/FlashSwapSetup.t.sol": {
-      "lastModificationDate": 1681398607282,
-      "contentHash": "c721f973117b35d84641bbbc1ab7bdb6",
+      "lastModificationDate": 1681400629172,
+      "contentHash": "cfa91245543c66fdf5fc847784e738fd",
       "sourceName": "test/FlashSwapSetup.t.sol",
       "solcConfig": {
         "settings": {

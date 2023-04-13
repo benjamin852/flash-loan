@@ -21,5 +21,13 @@ contract FlashSwapSetup is Test {
         v3Factory = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
 
         flashSwap = new FlashSwap(swapRouter, v3Factory, address(WETH));
+
+        vm.deal(vm.addr(1), 10 ether);
+
+        vm.prank(vm.addr(1));
+        WETH.deposit{value: 10 ether}();
+
+        ISwapRouter actualSwapRouter = flashSwap.swapRouter();
+        assertEq(address(swapRouter), address(actualSwapRouter));
     }
 }
