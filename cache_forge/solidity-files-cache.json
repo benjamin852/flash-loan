@@ -13,8 +13,8 @@
   },
   "files": {
     "contracts/FlashSwap.sol": {
-      "lastModificationDate": 1681397767998,
-      "contentHash": "127bdcd552b0ddda5691ceb82b65fe35",
+      "lastModificationDate": 1681422085814,
+      "contentHash": "6901af25201824baecade2f18caf3af6",
       "sourceName": "contracts/FlashSwap.sol",
       "solcConfig": {
         "settings": {
@@ -1637,8 +1637,8 @@
       }
     },
     "test/FlashSwap.t.sol": {
-      "lastModificationDate": 1681399869503,
-      "contentHash": "0fd536072849d5b278b3a3e8abd6366a",
+      "lastModificationDate": 1681426085019,
+      "contentHash": "44d1506f39d9d411f75a7eb608fedea2",
       "sourceName": "test/FlashSwap.t.sol",
       "solcConfig": {
         "settings": {
@@ -1711,14 +1711,14 @@
       ],
       "versionRequirement": "^0.7.6",
       "artifacts": {
-        "Constructor": {
-          "0.7.6+commit.7338295f.Darwin.appleclang": "FlashSwap.t.sol/Constructor.json"
+        "InitFlash": {
+          "0.7.6+commit.7338295f.Darwin.appleclang": "FlashSwap.t.sol/InitFlash.json"
         }
       }
     },
     "test/FlashSwapSetup.t.sol": {
-      "lastModificationDate": 1681400629172,
-      "contentHash": "cfa91245543c66fdf5fc847784e738fd",
+      "lastModificationDate": 1681426022867,
+      "contentHash": "a5b1607991046e46f2cd6359ee5d8d38",
       "sourceName": "test/FlashSwapSetup.t.sol",
       "solcConfig": {
         "settings": {
