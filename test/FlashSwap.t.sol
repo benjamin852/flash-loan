@@ -12,7 +12,7 @@ contract InitFlash is Test, FlashSwapSetup {
             FlashSwap.FlashParams({
                 token0: address(UNI),
                 token1: address(USDC),
-                fee1: 300,
+                fee1: 3000,
                 amount0: 2 ether,
                 amount1: 0,
                 fee2: 200,

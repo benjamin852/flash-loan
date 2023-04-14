@@ -62,23 +62,26 @@ contract FlashSwap is
     }
 
     /*** FUNCTIONS ***/
+    event CheckAddr(IUniswapV3Pool ewdfjo);
 
     /**
      * @notice create new flash loan on pool
      * @param _flashParams token addresses and fee
      */
     function initFlash(FlashParams memory _flashParams) external {
+        //unique struct for each pool
         PoolAddress.PoolKey memory poolKey = PoolAddress.PoolKey({
             token0: _flashParams.token0,
             token1: _flashParams.token1,
             fee: _flashParams.fee1
         });
-        address test = PoolAddress.computeAddress(factory, poolKey);
-        console.log(test);
+
         //get uniswap pool
         IUniswapV3Pool pool = IUniswapV3Pool(
             PoolAddress.computeAddress(factory, poolKey)
         );
+
+        emit CheckAddr(pool);
 
         // call flash on our pool
         // pool.flash(
