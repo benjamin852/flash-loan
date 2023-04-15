@@ -62,7 +62,6 @@ contract FlashSwap is
     }
 
     /*** FUNCTIONS ***/
-    event CheckAddr(IUniswapV3Pool ewdfjo);
 
     /**
      * @notice create new flash loan on pool
@@ -81,25 +80,23 @@ contract FlashSwap is
             PoolAddress.computeAddress(factory, poolKey)
         );
 
-        emit CheckAddr(pool);
-
         // call flash on our pool
-        // pool.flash(
-        //     address(this),
-        //     _flashParams.amount0,
-        //     _flashParams.amount1,
-        //     //will be decoded in the callback for part2 of tx
-        //     abi.encode(
-        //         FlashCallbackData({
-        //             amount0: _flashParams.amount0,
-        //             amount1: _flashParams.amount1,
-        //             payer: msg.sender,
-        //             poolKey: poolKey,
-        //             poolFee2: _flashParams.fee2,
-        //             poolFee3: _flashParams.fee3
-        //         })
-        //     )
-        // );
+        pool.flash(
+            address(this),
+            _flashParams.amount0,
+            _flashParams.amount1,
+            //will be decoded in the callback for part2 of tx
+            abi.encode(
+                FlashCallbackData({
+                    amount0: _flashParams.amount0,
+                    amount1: _flashParams.amount1,
+                    payer: msg.sender,
+                    poolKey: poolKey,
+                    poolFee2: _flashParams.fee2,
+                    poolFee3: _flashParams.fee3
+                })
+            )
+        );
     }
 
     /**
