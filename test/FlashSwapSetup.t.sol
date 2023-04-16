@@ -12,8 +12,8 @@ contract FlashSwapSetup is Test {
         ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
     IWETH9 public constant WETH9 =
         IWETH9(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
-    address constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
-    address constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    IERC20 public constant USDC =
+        IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
 
     FlashSwap public flashSwap;
 
@@ -24,10 +24,17 @@ contract FlashSwapSetup is Test {
 
         flashSwap = new FlashSwap(swapRouter, v3Factory, address(WETH9));
 
-        vm.deal(vm.addr(1), 10 ether);
+        vm.deal(address(flashSwap), 20 ether);
+        vm.deal(vm.addr(1), 20 ether);
 
         vm.prank(vm.addr(1));
-        WETH9.deposit{value: 10 ether}();
+        WETH9.deposit{value: 20 ether}();
+
+        vm.prank(address(flashSwap));
+        WETH9.deposit{value: 20 ether}();
+
+        vm.prank(0x756D64Dc5eDb56740fC617628dC832DDBCfd373c);
+        USDC.transfer(address(flashSwap), 0.0002 ether);
 
         ISwapRouter actualSwapRouter = flashSwap.swapRouter();
         assertEq(address(swapRouter), address(actualSwapRouter));

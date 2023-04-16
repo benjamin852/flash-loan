@@ -114,7 +114,6 @@ contract FlashSwap is
             (FlashCallbackData)
         );
 
-        /*
         //verify call coming from uniswap pool
         CallbackValidation.verifyCallback(factory, decoded.poolKey);
 
@@ -154,7 +153,7 @@ contract FlashSwap is
             })
         );
 
-        //swap out token1 for token0 pool with fee3
+        // //swap out token1 for token0 pool with fee3
         uint256 amountEarned1 = swapRouter.exactInputSingle(
             ISwapRouter.ExactInputSingleParams({
                 tokenIn: token0,
@@ -168,18 +167,17 @@ contract FlashSwap is
             })
         );
 
-        _paybackPool(
-            decoded.amount0,
-            decoded.amount1,
-            _fee0,
-            _fee1,
-            token0,
-            token1,
-            amountEarned0,
-            amountEarned1,
-            decoded.payer
-        );
-        */
+        // _paybackPool(
+        //     decoded.amount0,
+        //     decoded.amount1,
+        //     _fee0,
+        //     _fee1,
+        //     token0,
+        //     token1,
+        //     amountEarned0,
+        //     amountEarned1,
+        //     decoded.payer
+        // );
     }
 
     /*** HELPERS ***/
