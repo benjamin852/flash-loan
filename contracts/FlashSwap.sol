@@ -167,17 +167,17 @@ contract FlashSwap is
             })
         );
 
-        // _paybackPool(
-        //     decoded.amount0,
-        //     decoded.amount1,
-        //     _fee0,
-        //     _fee1,
-        //     token0,
-        //     token1,
-        //     amountEarned0,
-        //     amountEarned1,
-        //     decoded.payer
-        // );
+        _paybackPool(
+            decoded.amount0,
+            decoded.amount1,
+            _fee0,
+            _fee1,
+            token0,
+            token1,
+            amountEarned0,
+            amountEarned1,
+            decoded.payer
+        );
     }
 
     /*** HELPERS ***/
