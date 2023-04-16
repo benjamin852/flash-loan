@@ -114,6 +114,7 @@ contract FlashSwap is
             (FlashCallbackData)
         );
 
+        /*
         //verify call coming from uniswap pool
         CallbackValidation.verifyCallback(factory, decoded.poolKey);
 
@@ -178,6 +179,7 @@ contract FlashSwap is
             amountEarned1,
             decoded.payer
         );
+        */
     }
 
     /*** HELPERS ***/
