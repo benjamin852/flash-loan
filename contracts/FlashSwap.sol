@@ -33,8 +33,8 @@ contract FlashSwap is
         uint24 fee1; //fee for initial borrow
         uint256 amount0;
         uint256 amount1;
-        uint24 fee2; //fee for first pool to arb from
-        uint24 fee3; //fee for the second pool to arb from
+        uint24 fee2; //fee for second pool to arb from
+        uint24 fee3; //fee for the third pool to arb from
     }
 
     struct FlashCallbackData {
@@ -99,10 +99,12 @@ contract FlashSwap is
         );
     }
 
+    event TestMe(uint256 wazy);
+
     /**
-     * @param _fee0 fee for the first pool
-     * @param _fee1 fee for the second pool
-     * @param _data encoded from call data
+     * @param _fee0 fee owed for borrowed token0
+     * @param _fee1 fee owed for borrowed token1
+     * @param _data encoded FlashCallback struct
      */
     function uniswapV3FlashCallback(
         uint256 _fee0,
@@ -120,7 +122,7 @@ contract FlashSwap is
         address token0 = decoded.poolKey.token0;
         address token1 = decoded.poolKey.token1;
 
-        //approve router to interact with token0
+        //approve uni SwapRouter to interact with tokens received from flash loan
         TransferHelper.safeApprove(
             token0,
             address(swapRouter),
@@ -134,6 +136,7 @@ contract FlashSwap is
             decoded.amount1
         );
 
+        emit TestMe(_fee0);
         // set min amount to revert if trade no profitable
         uint256 amount0Min = LowGasSafeMath.add(decoded.amount0, _fee0);
         uint256 amount1Min = LowGasSafeMath.add(decoded.amount1, _fee1);
@@ -146,7 +149,7 @@ contract FlashSwap is
                 tokenOut: token0,
                 fee: decoded.poolFee2,
                 recipient: address(this),
-                deadline: block.timestamp + 200,
+                deadline: block.timestamp + 100, //must execute in same block
                 amountIn: decoded.amount1,
                 amountOutMinimum: amount0Min,
                 sqrtPriceLimitX96: 0
@@ -160,24 +163,24 @@ contract FlashSwap is
                 tokenOut: token1,
                 fee: decoded.poolFee3,
                 recipient: address(this),
-                deadline: block.timestamp + 200,
+                deadline: block.timestamp + 100,
                 amountIn: decoded.amount0,
                 amountOutMinimum: amount1Min,
                 sqrtPriceLimitX96: 0
             })
         );
 
-        _paybackPool(
-            decoded.amount0,
-            decoded.amount1,
-            _fee0,
-            _fee1,
-            token0,
-            token1,
-            amountEarned0,
-            amountEarned1,
-            decoded.payer
-        );
+        // _paybackPool(
+        //     decoded.amount0,
+        //     decoded.amount1,
+        //     _fee0,
+        //     _fee1,
+        //     token0,
+        //     token1,
+        //     amountEarned0,
+        //     amountEarned1,
+        //     decoded.payer
+        // );
     }
 
     /*** HELPERS ***/

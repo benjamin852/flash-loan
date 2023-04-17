@@ -20,10 +20,10 @@ contract InitFlash is Test, FlashSwapSetup {
                 token0: address(USDC),
                 token1: address(WETH9),
                 fee1: 500,
-                amount0: 0.000001 ether,
-                amount1: 0.000001 ether,
-                fee2: 200,
-                fee3: 300
+                amount0: 10000000000, //100k usdc
+                amount1: 300 ether,
+                fee2: 3000,
+                fee3: 10000
             })
         );
     }

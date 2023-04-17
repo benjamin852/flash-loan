@@ -34,7 +34,7 @@ contract FlashSwapSetup is Test {
         WETH9.deposit{value: 20 ether}();
 
         vm.prank(0x756D64Dc5eDb56740fC617628dC832DDBCfd373c);
-        USDC.transfer(address(flashSwap), 0.0002 ether);
+        USDC.transfer(address(flashSwap), 100000000000);
 
         ISwapRouter actualSwapRouter = flashSwap.swapRouter();
         assertEq(address(swapRouter), address(actualSwapRouter));
