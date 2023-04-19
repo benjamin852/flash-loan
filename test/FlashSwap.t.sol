@@ -23,8 +23,10 @@ contract InitFlash is Test, FlashSwapSetup {
                 amount0: 10000000000, //100k usdc
                 amount1: 300 ether,
                 fee2: 3000,
-                fee3: 10000
+                fee3: 3000
             })
         );
     }
 }
+// 10_000_000_000 //100k
+// 5_000_000

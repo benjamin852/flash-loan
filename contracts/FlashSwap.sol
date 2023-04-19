@@ -138,34 +138,34 @@ contract FlashSwap is
 
         emit TestMe(_fee0);
         // set min amount to revert if trade no profitable
-        uint256 amount0Min = LowGasSafeMath.add(decoded.amount0, _fee0);
-        uint256 amount1Min = LowGasSafeMath.add(decoded.amount1, _fee1);
+        uint256 amountOut0Min = LowGasSafeMath.add(decoded.amount0, _fee0);
+        uint256 amountOut1Min = LowGasSafeMath.add(decoded.amount1, _fee1);
 
         //swap out withdrawn token0 for token1 in pool with fee2
         // pool determined by token pair with next pool fee
-        uint256 amountEarned0 = swapRouter.exactInputSingle(
+        uint256 amountEarnedToken0 = swapRouter.exactInputSingle(
             ISwapRouter.ExactInputSingleParams({
-                tokenIn: token1,
-                tokenOut: token0,
-                fee: decoded.poolFee2,
-                recipient: address(this),
-                deadline: block.timestamp + 100, //must execute in same block
-                amountIn: decoded.amount1,
-                amountOutMinimum: amount0Min,
+                tokenIn: token1, //eth
+                tokenOut: token0, //usdc
+                fee: decoded.poolFee2, //0.3%
+                recipient: address(this), //me
+                deadline: block.timestamp, //same block
+                amountIn: decoded.amount1, //overvalued eth
+                amountOutMinimum: amountOut0Min, //undervalued usdc
                 sqrtPriceLimitX96: 0
             })
         );
 
         // //swap out token1 for token0 pool with fee3
-        uint256 amountEarned1 = swapRouter.exactInputSingle(
+        uint256 amountEarnedToken1 = swapRouter.exactInputSingle(
             ISwapRouter.ExactInputSingleParams({
-                tokenIn: token0,
-                tokenOut: token1,
-                fee: decoded.poolFee3,
-                recipient: address(this),
-                deadline: block.timestamp + 100,
-                amountIn: decoded.amount0,
-                amountOutMinimum: amount1Min,
+                tokenIn: token0, //usdc
+                tokenOut: token1, //eth
+                fee: decoded.poolFee3, //0.3%
+                recipient: address(this), //me
+                deadline: block.timestamp, //execute in same block
+                amountIn: decoded.amount0, //overvalud usdc
+                amountOutMinimum: amountOut1Min, //undervalued eth
                 sqrtPriceLimitX96: 0
             })
         );
@@ -177,8 +177,8 @@ contract FlashSwap is
         //     _fee1,
         //     token0,
         //     token1,
-        //     amountEarned0,
-        //     amountEarned1,
+        //     amountEarnedToken0,
+        //     amountEarnedToken1,
         //     decoded.payer
         // );
     }
